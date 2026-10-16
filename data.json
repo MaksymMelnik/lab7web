@@ -1,0 +1,6 @@
+[
+  { "name": "Артур", "affiliation": "Алхіміки", "description": "Дослідник" },
+  { "name": "Віктор", "affiliation": "Маги", "description": "Майстер заклять" },
+  { "name": "Богдан", "affiliation": "Алхіміки", "description": "Лаборант" },
+  { "name": "Олена", "affiliation": "Вчені", "description": "Професор" }
+]

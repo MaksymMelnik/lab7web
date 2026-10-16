@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Генератор жартів</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 40px; background-color: #f4f6f9; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { color: #007bff; margin-top: 0; }
+        button { background-color: #007bff; color: white; border: none; padding: 12px 20px; font-size: 15px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #0056b3; }
+        #joke-box { margin-top: 20px; padding: 15px; background: #e9ecef; border-left: 4px solid #007bff; border-radius: 4px; font-style: italic; min-height: 40px; line-height: 1.5; }
+        .nav { margin-bottom: 20px; }
+        .nav a { color: #007bff; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav"><a href="index.html">&larr; На головну</a></div>
+    <h2>Генератор жартів</h2>
+    <p>Натисніть кнопку, щоб підвантажити випадковий жарт із файлу без перезавантаження сторінки.</p>
+    <button onclick="loadRandomJoke()">Отримати випадковий жарт</button>
+    <div id="joke-box">Натисніть кнопку вище...</div>
+</div>
+
+<script>
+function loadRandomJoke() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var jokes = this.responseText.split('\n').filter(function(j) { return j.trim() !== ''; });
+            var randomIndex = Math.floor(Math.random() * jokes.length);
+            document.getElementById("joke-box").innerText = jokes[randomIndex];
+        }
+    };
+    xhttp.open("GET", "jokes.txt", true);
+    xhttp.send();
+}
+</script>
+
+</body>
+</html>

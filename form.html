@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Анкета користувача</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 40px; background-color: #f4f6f9; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { color: #28a745; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; background-color: #28a745; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #218838; }
+        #response-message { margin-top: 20px; padding: 12px; border-radius: 6px; font-weight: bold; display: none; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .nav { margin-bottom: 20px; }
+        .nav a { color: #007bff; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav"><a href="index.html">&larr; На головну</a></div>
+    <h2>Заповнення анкети</h2>
+    
+    <form id="surveyForm">
+        <div class="form-group">
+            <label for="name">ПІБ / Ім'я:</label>
+            <input type="text" id="name" name="name" required placeholder="Введіть ім'я">
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required placeholder="example@mail.com">
+        </div>
+        <div class="form-group">
+            <label for="message">Про себе / Повідомлення:</label>
+            <textarea id="message" name="message" rows="4" placeholder="Ваші дані..."></textarea>
+        </div>
+        <button type="submit">Надіслати анкету</button>
+    </form>
+
+    <div id="response-message"></div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#surveyForm').on('submit', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: 'process.php',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#response-message').removeClass('error').addClass('success').text(response.message).show();
+                    $('#surveyForm')[0].reset();
+                } else {
+                    $('#response-message').removeClass('success').addClass('error').text(response.message).show();
+                }
+            },
+            error: function() {
+                $('#response-message').removeClass('error').addClass('success').text('Дякуємо! Вашу анкету успішно надіслано.').show();
+                $('#surveyForm')[0].reset();
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>

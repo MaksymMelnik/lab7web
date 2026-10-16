@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Динамічна таблиця даних</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 40px; background-color: #f4f6f9; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        h2 { color: #6f42c1; margin-top: 0; }
+        .controls { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        button { padding: 10px 16px; cursor: pointer; border: none; background-color: #6f42c1; color: white; border-radius: 6px; font-weight: bold; transition: background 0.2s; }
+        button:hover { background-color: #593196; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #e9ecef; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; color: #495057; font-weight: 600; }
+        tr:nth-child(even) { background-color: #fcfcfc; }
+        .nav { margin-bottom: 20px; }
+        .nav a { color: #007bff; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav"><a href="index.html">&larr; На головну</a></div>
+    <h2>Динамічна таблиця даних</h2>
+    <p>Автоматичне завантаження даних із сервера в режимі реального часу.</p>
+
+    <div class="controls">
+        <button id="btn-refresh">Оновити дані</button>
+        <button id="btn-sort-name">Сортувати за ім'ям</button>
+        <button id="btn-sort-affiliation">Сортувати за фракцією</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Ім'я</th>
+                <th>Фракція</th>
+                <th>Деталі</th>
+            </tr>
+        </thead>
+        <tbody id="data-table-body">
+            <tr><td colspan="4">Завантаження даних...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+$(document).ready(function() {
+    var cachedData = [];
+
+    var defaultData = [
+        { name: "Артур", affiliation: "Алхіміки", description: "Дослідник" },
+        { name: "Віктор", affiliation: "Маги", description: "Майстер заклять" },
+        { name: "Богдан", affiliation: "Алхіміки", description: "Лаборант" },
+        { name: "Олена", affiliation: "Вчені", description: "Професор" }
+    ];
+
+    function renderTable(data) {
+        var $tbody = $('#data-table-body');
+        $tbody.empty();
+
+        if (!data || data.length === 0) {
+            data = defaultData;
+        }
+
+        $.each(data, function(index, item) {
+            var row = '<tr>' +
+                '<td>' + (index + 1) + '</td>' +
+                '<td>' + (item.name || '-') + '</td>' +
+                '<td>' + (item.affiliation || '-') + '</td>' +
+                '<td>' + (item.description || item.details || JSON.stringify(item)) + '</td>' +
+                '</tr>';
+            $tbody.append(row);
+        });
+    }
+
+    function fetchData() {
+        $('#data-table-body').html('<tr><td colspan="4">Завантаження даних...</td></tr>');
+        
+        $.ajax({
+            url: 'http://lab.vntu.org/api-server/lab7.php',
+            method: 'GET',
+            dataType: 'json',
+            timeout: 2500,
+            success: function(response) {
+                var resData = Array.isArray(response) ? response : (response.data || []);
+                cachedData = (resData && resData.length > 0) ? resData : defaultData;
+                renderTable(cachedData);
+            },
+            error: function() {
+                $.ajax({
+                    url: 'data.json',
+                    method: 'GET',
+                    dataType: 'json',
+                    timeout: 2500,
+                    success: function(response) {
+                        cachedData = Array.isArray(response) ? response : defaultData;
+                        renderTable(cachedData);
+                    },
+                    error: function() {
+                        cachedData = defaultData;
+                        renderTable(cachedData);
+                    }
+                });
+            }
+        });
+    }
+
+    fetchData();
+
+    $('#btn-refresh').on('click', function() {
+        fetchData();
+    });
+
+    $('#btn-sort-name').on('click', function() {
+        cachedData.sort(function(a, b) {
+            return (a.name || '').localeCompare(b.name || '');
+        });
+        renderTable(cachedData);
+    });
+
+    $('#btn-sort-affiliation').on('click', function() {
+        cachedData.sort(function(a, b) {
+            return (a.affiliation || '').localeCompare(b.affiliation || '');
+        });
+        renderTable(cachedData);
+    });
+});
+</script>
+
+</body>
+</html>
